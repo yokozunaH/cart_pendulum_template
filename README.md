@@ -1,4 +1,4 @@
-# cart_pendulum
+# cart_pendulum_template
 Cart-pendulum template for Robot Design Studio 2020
 
 ## Overview
