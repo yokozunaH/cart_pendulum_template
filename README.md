@@ -9,8 +9,10 @@ The workflow is depicted below.
 ![architecture](/graphics/svg/template_architecture.svg)
 
 `derive_equations.m` uses symbolic computation to generate the state-space dynamics of the cart-pendulum, which are then exported as MATLAB functions (e.g., `autogen_drift_vector_field.m` and `autogen_control_vector_field.m`).
-
 If necessary, symbolic math related to controller design can also be implemented in `derive_equations.m`, but this has not been done yet.
+
+For now, you can do iterative controller design in `main.m`.
+Depending on the kinds of controllers you are designing, you might want to create a custom layer of middleware dedicated to controls.
 
 
 ## Attention Students
