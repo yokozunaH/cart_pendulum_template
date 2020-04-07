@@ -7,6 +7,8 @@ That means you have to run `derive_equations.m` before you run `main.m` for the 
 
 `derive_equations.m` uses symbolic computation to generate the state-space dynamics of the cart-pendulum, which are then exported as MATLAB functions (e.g., `autogen_drift_vector_field.m` and `autogen_control_vector_field.m`).
 
+![architecture](/graphics/svg/template_architecture.svg)
+
 If necessary, symbolic math related to controller design can also be implemented in `derive_equations.m`, but this has not been done yet.
 
 
