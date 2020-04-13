@@ -99,12 +99,12 @@ fprintf('\t...done.\n');
 fprintf('\tGenerating forward kinematics equations...\n');
 
 % compute the (x,y) location of the pendulum's center of mass:
-x_com_pend = ; % TODO
-y_com_pend = ; % TODO
+x_com_pend = x_cart + r_com_pend*cos(theta_pend); % TODO
+y_com_pend = r_com_pend*sin(theta_pend); % TODO
 
 % compute the (x,y) location of the pendulum's tip:
-x_tip_pend = ; % TODO
-y_tip_pend = ; % TODO
+x_tip_pend = x_cart + l_pend*cos(theta_pend); % TODO
+y_tip_pend = l_pend*sin(theta_pend); % TODO
 
 % create a 2x6 array to hold all forward kinematics (FK) outputs:
 FK = [x_cart, x_com_pend, x_tip_pend;
@@ -128,6 +128,7 @@ syms dx_com_cart dx_com_pend dy_com_pend real
 dx_com_cart = derivative(x_cart);
 dx_com_pend = derivative(x_com_pend);
 dy_com_pend = derivative(y_com_pend);
+dtheta_pend = derivative(theta_pend);
 fprintf('\t...done.\n');
 
 %% Kinetic energy
@@ -136,8 +137,8 @@ fprintf('\tGenerating kinetic energy equation...\n');
 syms ke1 ke2 ke3 real
 
 % kinetic energy of each body:
-ke_cart = ; % TODO: kinetic energy of the cart (translational)
-ke_pend = ; % TODO: kinetic energy of the pendulum (translation + rotation)
+ke_cart = 0.5* m_cart* dx_com_cart^2; % TODO: kinetic energy of the cart (translational)
+ke_pend = 0.5*m_pend*(dx_com_pend^2 + dy_com_pend^2) + 0.5*I_pend*dtheta_pend^2; % TODO: kinetic energy of the pendulum (translation + rotation)
 
 % total kinetic energy:
 KE = ke_cart + ke_pend;
@@ -150,7 +151,7 @@ fprintf('\tGenerating potential energy equation...\n');
 syms PE real
 
 % potential energy of the pendulum:
-PE = ; % TODO
+PE = m_pend* g* y_com_pend; % TODO
 % Note: the cart moves horizontally so its gravitational PE never changes.
 
 fprintf('\t...done.\n');
@@ -227,12 +228,12 @@ for i = 1:numel(q)
     fprintf('\t\t\tM(%d,:)...\n',i)
     for j = 1:numel(q)
         fprintf('\t\t\t\tj = %d\n',j);
-        M(i,j) = ; % TODO
+        M(i,j) = diff(ELeq_LHS(i), ddq(j)); % TODO
         M(i,j) = simplify(M(i,j));
     end
     
     fprintf('\t\t\tG(%d)...\n',i)
-    G(i) = diff(TODO)*g; % G is linear in g
+    G(i) = diff(ELeq_LHS(i), g)*g; % G is linear in g %TODO
     
     fprintf('\t\t\tC(%d)...\n',i);
     % C*dq is everything else:
@@ -321,8 +322,8 @@ g_ss = sym('g_ss',[2*numel(q),1],'real'); % control vector field
 %
 %   Note: the "_ss" suffix stands for "state-space" (not "steady-state").
 
-temp_drift = ; % TODO, also use simplify(...)
-temp_ctrl = ; % TODO, also use simplify(...)
+temp_drift = simplify(-Minv*(C*dq + G)); % TODO, also use simplify(...)
+temp_ctrl = simplify(Minv*[1;0]); % TODO, also use simplify(...)
 
 % Build state-space representation:
 for i = 1:numel(q)
@@ -342,21 +343,23 @@ fprintf('\tLinearizing the dynamics about the upright equilibrium...\n')
 
 % Note: we linearize the state-space dynamics by performing a 1st-order
 % Taylor series approximation, evaluated at the upright equilibrium:
-x_cart_eq = ; % TODO
-theta_pend_eq = ; % TODO; theta_pend is defined ccw+ w.r.t. x-axis
-dx_cart_eq = ; % TODO
-dtheta_pend_eq = ; % TODO
+
+x_cart_eq = 0; % TODO
+theta_pend_eq = pi/2; % TODO; theta_pend is defined ccw+ w.r.t. x-axis
+dx_cart_eq = 0; % TODO
+dtheta_pend_eq = 0; % TODO
 
 % Note: we have been talking about x for a while above but haven't needed
 % to define it as a symbolic variable until now:
 x = [q; dq]; % just makes the code below easier to read)
 
 % define the equilibrium state:
-x_eq = ; % TODO
+x_eq = [x_cart_eq; theta_pend_eq; dx_cart_eq; dtheta_pend_eq]; % TODO
 
 % Step 1 of Taylor series approximation is to compute Jacobians:
-f_ss_jac = ; % TODO: Jacobian of f_ss
-g_ss_jac = ; % TODO: Jacobian of g_ss*u
+f_ss_jac = jacobian(f_ss, x); % TODO: Jacobian of f_ss
+g_ss_jac = jacobian(g_ss*u, u); % TODO: Jacobian of g_ss*u
+
 % Note: g_ss_jac = g_ss because the nonlinear state-space dynamics are
 % control-affine, but you should verify this!
 
